@@ -1,0 +1,815 @@
+***** AI--> Artificial Intelligent *****
+
+*** 1(A) vacuum cleaner agent. ***
+
+table = {
+    ("A", "Dirty"): "Suck",
+    ("A", "Clean"): "Move Right",
+    ("B", "Dirty"): "Suck",
+    ("B", "Clean"): "Move Left"
+}
+
+print("Vacuum Cleaner Agent")
+print("--------------------")
+
+location = input("Enter location (A/B): ")
+status = input("Enter status (Dirty/Clean): ")
+
+percept = (location, status)
+action = table.get(percept)
+
+print("Action to perform:", action)
+
+
+*** 1(B) autonomous taxi agent ***
+
+table = {
+    ("Red", "Obstacle"): "Stop",
+    ("Green", "Clear"): "Move Forward",
+    ("Yellow", "Clear"): "Slow Down",
+    ("Red", "Clear"): "Stop",
+    ("Green", "Obstacle"): "Brake"
+}
+
+print("Autonomous Taxi Agent")
+print("---------------------")
+
+signal = input("Enter traffic signal (Red/Yellow/Green): ")
+road = input("Enter road condition (Clear/Obstacle): ")
+
+percept = (signal, road)
+action = table.get(percept)
+
+print("Action to perform:", action)
+
+
+*** 2) bfs_8puzzle ***
+
+from collections import deque
+
+def print_puzzle(state):
+    for row in state:
+        print(row)
+    print()
+
+def find_zero(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+def generate_moves(state):
+    moves = []
+    x, y = find_zero(state)
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    for dx, dy in directions:
+        nx = x + dx
+        ny = y + dy
+
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new_state = [row[:] for row in state]
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            moves.append(new_state)
+
+    return moves
+
+def bfs(start, goal):
+    queue = deque()
+    visited = []
+
+    queue.append((start, []))
+    visited.append(start)
+
+    while queue:
+        current_state, path = queue.popleft()
+
+        if current_state == goal:
+            return path + [current_state]
+
+        for move in generate_moves(current_state):
+            if move not in visited:
+                visited.append(move)
+                queue.append((move, path + [current_state]))
+
+    return None
+
+start = [
+    [1, 2, 3],
+    [4, 0, 6],
+    [7, 5, 8]
+]
+
+goal = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 0]
+]
+
+solution = bfs(start, goal)
+
+print("Solution Path:\n")
+for step in solution:
+    print_puzzle(step)
+
+
+*** 3) waterjug_dfs ***
+
+
+jug1 = 4
+jug2 = 3
+target = 2
+
+visited = set()
+
+def dfs(x, y):
+    if (x, y) in visited:
+        return False
+
+    print((x, y))
+    visited.add((x, y))
+
+    if x == target or y == target:
+        print("Target reached!")
+        return True
+
+    return (
+        dfs(jug1, y) or
+        dfs(x, jug2) or
+        dfs(0, y) or
+        dfs(x, 0) or
+        dfs(x - min(x, jug2-y), y + min(x, jug2-y)) or
+        dfs(x + min(y, jug1-x), y - min(y, jug1-x))
+    )
+
+dfs(0, 0)
+
+
+*** 4) uniform_cost_search ***
+
+
+import heapq
+
+graph = {
+    "Mumbai": [("Pune", 150), ("Hyderabad", 710)],
+    "Pune": [("Mumbai", 150), ("Bangalore", 840)],
+    "Hyderabad": [("Mumbai", 710), ("Bangalore", 570)],
+    "Bangalore": [("Pune", 840), ("Hyderabad", 570)]
+}
+
+def ucs(start, goal):
+    queue = [(0, start, [start])]
+    visited = []
+
+    while queue:
+        cost, city, path = heapq.heappop(queue)
+
+        if city == goal:
+            return cost, path
+
+        if city not in visited:
+            visited.append(city)
+
+            for neighbor, distance in graph[city]:
+                heapq.heappush(
+                    queue,
+                    (cost + distance, neighbor, path + [neighbor])
+                )
+
+    return None, None
+
+cost, path = ucs("Mumbai", "Bangalore")
+print("Least-cost Path")
+print("Path:", " -> ".join(path))
+print("Total Distance:", cost, "km")
+
+
+*** 4) greedy_best_first_8puzzle ***
+
+
+from heapq import heappush, heappop
+
+goal = [[1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 0]]
+
+def heuristic(state):
+    distance = 0
+    for i in range(3):
+        for j in range(3):
+            value = state[i][j]
+            if value != 0:
+                goal_x = (value - 1) // 3
+                goal_y = (value - 1) % 3
+                distance += abs(i - goal_x) + abs(j - goal_y)
+    return distance
+
+def find_blank(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+def get_neighbors(state):
+    x, y = find_blank(state)
+    moves = [(-1,0),(1,0),(0,-1),(0,1)]
+    neighbors = []
+
+    for dx, dy in moves:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new_state = [row[:] for row in state]
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            neighbors.append(new_state)
+    return neighbors
+
+def greedy(start):
+    visited = set()
+    pq = []
+    heappush(pq, (heuristic(start), start))
+
+    while pq:
+        h, state = heappop(pq)
+        key = str(state)
+        if key in visited:
+            continue
+
+        visited.add(key)
+        print("Heuristic =", h)
+        for row in state:
+            print(row)
+        print()
+
+        if state == goal:
+            print("Goal Reached!")
+            return
+
+        for neighbor in get_neighbors(state):
+            if str(neighbor) not in visited:
+                heappush(pq, (heuristic(neighbor), neighbor))
+
+start = [[1, 2, 3],
+         [4, 0, 6],
+         [7, 5, 8]]
+
+greedy(start)
+
+
+*** 6) A_star_8puzzle ***
+
+from heapq import heappush, heappop
+
+goal = [[1,2,3],
+        [4,5,6],
+        [7,8,0]]
+
+def heuristic(state):
+    h = 0
+    for i in range(3):
+        for j in range(3):
+            value = state[i][j]
+            if value != 0:
+                x = (value - 1) // 3
+                y = (value - 1) % 3
+                h += abs(i - x) + abs(j - y)
+    return h
+
+def find_blank(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+def neighbors(state):
+    x, y = find_blank(state)
+    moves = [(1,0),(0,1),(0,-1),(-1,0)]
+    result = []
+
+    for dx, dy in moves:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new = [row[:] for row in state]
+            new[x][y], new[nx][ny] = new[nx][ny], new[x][y]
+            result.append(new)
+
+    return result
+
+def astar(start):
+    pq = []
+    visited = set()
+
+    g = 0
+    h = heuristic(start)
+    f = g + h
+
+    heappush(pq, (f, g, start))
+
+    while pq:
+        f, g, state = heappop(pq)
+
+        if str(state) in visited:
+            continue
+
+        visited.add(str(state))
+
+        print("g =", g, ", h =", heuristic(state), ", f =", f)
+        for row in state:
+            print(row)
+        print()
+
+        if state == goal:
+            print("Goal Reached!")
+            return
+
+        for next_state in neighbors(state):
+            if str(next_state) not in visited:
+                new_g = g + 1
+                new_h = heuristic(next_state)
+                new_f = new_g + new_h
+                heappush(pq, (new_f, new_g, next_state))
+
+start = [[1,2,3],
+         [4,0,6],
+         [7,5,8]]
+
+astar(start)
+
+
+*** 7) A_star_A_rad_bucharest ***
+
+
+import heapq
+
+graph = {
+    'Arad': [('Zerind', 75), ('Sibiu', 140), ('Timisoara', 118)],
+    'Zerind': [('Arad', 75), ('Oradea', 71)],
+    'Oradea': [('Zerind', 71), ('Sibiu', 151)],
+    'Sibiu': [('Arad', 140), ('Oradea', 151), ('Fagaras', 99), ('Rimnicu Vilcea', 80)],
+    'Timisoara': [('Arad', 118), ('Lugoj', 111)],
+    'Lugoj': [('Timisoara', 111), ('Mehadia', 70)],
+    'Mehadia': [('Lugoj', 70), ('Drobeta', 75)],
+    'Drobeta': [('Mehadia', 75), ('Craiova', 120)],
+    'Craiova': [('Drobeta', 120), ('Rimnicu Vilcea', 146), ('Pitesti', 138)],
+    'Rimnicu Vilcea': [('Sibiu', 80), ('Craiova', 146), ('Pitesti', 97)],
+    'Fagaras': [('Sibiu', 99), ('Bucharest', 211)],
+    'Pitesti': [('Rimnicu Vilcea', 97), ('Craiova', 138), ('Bucharest', 101)],
+    'Bucharest': [('Fagaras', 211), ('Pitesti', 101)]
+}
+
+heuristic = {
+    'Arad': 366,
+    'Zerind': 374,
+    'Oradea': 380,
+    'Sibiu': 253,
+    'Timisoara': 329,
+    'Lugoj': 244,
+    'Mehadia': 241,
+    'Drobeta': 242,
+    'Craiova': 160,
+    'Rimnicu Vilcea': 193,
+    'Fagaras': 176,
+    'Pitesti': 100,
+    'Bucharest': 0
+}
+
+def astar(start, goal):
+    queue = []
+    heapq.heappush(queue, (heuristic[start], 0, start, [start]))
+    visited = set()
+
+    while queue:
+        f_cost, g_cost, city, path = heapq.heappop(queue)
+
+        if city == goal:
+            return g_cost, path
+
+        if city in visited:
+            continue
+
+        visited.add(city)
+
+        for neighbor, distance in graph[city]:
+            if neighbor not in visited:
+                new_g = g_cost + distance
+                new_f = new_g + heuristic[neighbor]
+                heapq.heappush(queue, (new_f, new_g, neighbor, path + [neighbor]))
+
+    return None, []
+
+cost, path = astar('Arad', 'Bucharest')
+print("Shortest Path using A* Search:")
+print("Path:", " -> ".join(path))
+print("Total Cost:", cost)
+
+
+*** 8) bayes_rule ***
+
+
+P_D = 0.01
+P_Pos_D = 0.99
+P_Pos_NotD = 0.05
+P_NotD = 1 - P_D
+
+P_D_Pos = (P_Pos_D * P_D) / ((P_Pos_D * P_D) + (P_Pos_NotD * P_NotD))
+
+print("Probability that person actually has disease:")
+print(round(P_D_Pos * 100, 2), "%")
+
+
+*** 9) naive_bayes_weather ***
+
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.naive_bayes import GaussianNB
+
+data = {
+    'Outlook': ['Sunny', 'Sunny', 'Overcast', 'Rainy', 'Rainy', 'Rainy', 'Overcast'],
+    'Temperature': ['Hot', 'Hot', 'Hot', 'Mild', 'Cool', 'Cool', 'Cool'],
+    'Humidity': ['High', 'High', 'High', 'High', 'Normal', 'Normal', 'Normal'],
+    'Windy': ['False', 'True', 'False', 'False', 'False', 'True', 'True'],
+    'Play': ['No', 'No', 'Yes', 'Yes', 'Yes', 'No', 'Yes']
+}
+
+df = pd.DataFrame(data)
+
+le = LabelEncoder()
+for col in df.columns:
+    df[col] = le.fit_transform(df[col])
+
+X = df[['Outlook', 'Temperature', 'Humidity', 'Windy']]
+y = df['Play']
+
+model = GaussianNB()
+model.fit(X, y)
+
+test = pd.DataFrame(
+    [[2, 0, 0, 1]],
+    columns=['Outlook', 'Temperature', 'Humidity', 'Windy']
+)
+
+prediction = model.predict(test)
+
+if prediction[0] == 1:
+    print("Prediction: Yes, we can play")
+else:
+    print("Prediction: No, we cannot play")
+
+
+*** 10(A) bayesian_network  ***
+
+
+from pgmpy.models import DiscreteBayesianNetwork
+
+model = DiscreteBayesianNetwork([
+    ('Burglary', 'Alarm'),
+    ('Earthquake', 'Alarm'),
+    ('Alarm', 'JohnCalls'),
+    ('Alarm', 'MaryCalls')
+])
+
+print("Nodes in the Bayesian Network:")
+print(model.nodes())
+
+print("\nEdges in the Bayesian Network:")
+print(model.edges())
+
+
+*** 10(B) bayesian_posterior ***
+
+from pgmpy.models import DiscreteBayesianNetwork
+from pgmpy.factors.discrete import TabularCPD
+from pgmpy.inference import VariableElimination
+
+model = DiscreteBayesianNetwork([('Burglary', 'Alarm')])
+
+cpd_burglary = TabularCPD(
+    variable='Burglary',
+    variable_card=2,
+    values=[[0.999], [0.001]]
+)
+
+cpd_alarm = TabularCPD(
+    variable='Alarm',
+    variable_card=2,
+    values=[
+        [0.99, 0.05],
+        [0.01, 0.95]
+    ],
+    evidence=['Burglary'],
+    evidence_card=[2]
+)
+
+model.add_cpds(cpd_burglary, cpd_alarm)
+
+print("Model Valid:", model.check_model())
+
+infer = VariableElimination(model)
+
+result = infer.query(
+    variables=['Burglary'],
+    evidence={'Alarm': 1}
+)
+
+print(result)
+
+
+
+
+***** ML ---> Machine Learning *****
+
+
+*** 1) basic_workflow ***
+
+*** student.csv *** 
+
+Hours,Attendance,Result
+2,60,Fail
+3,65,Fail
+4,70,Pass
+5,75,Pass
+6,80,Pass
+1,50,Fail
+7,90,Pass
+3,55,Fail
+8,95,Pass
+5,85,Pass
+
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+data = pd.read_csv("student.csv")
+
+print("Dataset:")
+print(data)
+
+le = LabelEncoder()
+data["Result"] = le.fit_transform(data["Result"])
+
+X = data[["Hours", "Attendance"]]
+y = data["Result"]
+
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=1
+)
+
+model = KNeighborsClassifier()
+model.fit(X_train, y_train)
+
+train_pred = model.predict(X_train)
+test_pred = model.predict(X_test)
+
+print("Training Accuracy:", accuracy_score(y_train, train_pred) * 100)
+print("Testing Accuracy:", accuracy_score(y_test, test_pred) * 100)
+
+
+*** 2) linear_regression ***
+
+*** studentmarks.csv ***
+
+Hours,Marks
+1,20
+2,25
+3,35
+4,40
+5,50
+6,55
+7,65
+8,70
+9,80
+10,90
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+data = pd.read_csv("studentmarks.csv")
+
+X = data[['Hours']]
+y = data['Marks']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=1
+)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+print("Training Accuracy:", round(model.score(X_train, y_train) * 100, 2))
+print("Testing Accuracy:", round(model.score(X_test, y_test) * 100, 2))
+
+new_data = pd.DataFrame([[11]], columns=['Hours'])
+pred = model.predict(new_data)
+
+print("Predicted Marks for 11 hours:", round(pred[0], 2))
+
+
+*** 3) mnist_binary_classifier ***
+
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+digits = load_digits()
+
+X = digits.data
+y = (digits.target == 5)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=1
+)
+
+model = KNeighborsClassifier(n_neighbors=3)
+model.fit(X_train, y_train)
+
+print("Training Accuracy:", model.score(X_train, y_train) * 100)
+print("Testing Accuracy:", model.score(X_test, y_test) * 100)
+
+prediction = model.predict([X_test[0]])
+
+if prediction[0]:
+    print("Digit is 5")
+else:
+    print("Digit is not 5")
+
+
+
+*** 4) kfold_cross_validation ***
+
+from sklearn.datasets import load_iris
+from sklearn.model_selection import cross_val_score
+from sklearn.neighbors import KNeighborsClassifier
+
+iris = load_iris()
+
+X = iris.data
+y = iris.target
+
+model = KNeighborsClassifier()
+
+scores = cross_val_score(model, X, y, cv=5)
+
+print("Accuracy scores for each fold:")
+print(scores)
+
+print("Average Accuracy:", round(scores.mean() * 100, 2), "%")
+
+
+*** 5) decision_tree_classifier ***
+
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+iris = load_iris()
+
+X = iris.data
+y = iris.target
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=1
+)
+
+model = DecisionTreeClassifier(random_state=1)
+
+model.fit(X_train, y_train)
+
+print("Training Accuracy:", model.score(X_train, y_train) * 100)
+print("Testing Accuracy:", model.score(X_test, y_test) * 100)
+
+prediction = model.predict([X_test[0]])
+
+print("Predicted Flower:", iris.target_names[prediction[0]])
+
+
+*** 6) decision_tree_regression ***
+
+*** studentmarks.csv ***
+
+Hours,Marks
+1,20
+2,25
+3,35
+4,40
+5,50
+6,55
+7,65
+8,70
+9,80
+10,90
+
+
+import pandas as pd
+from sklearn.tree import DecisionTreeRegressor
+
+data = pd.read_csv("studentmarks.csv")
+
+X = data[['Hours']]
+y = data['Marks']
+
+model = DecisionTreeRegressor(max_depth=3, random_state=1)
+
+model.fit(X, y)
+
+new_student = pd.DataFrame([[7.5]], columns=['Hours'])
+prediction = model.predict(new_student)
+
+print("Predicted Marks for 7.5 Hours:", round(prediction[0], 2))
+
+
+*** 7) knn_classifier ***
+
+*** studentknn.csv ***
+
+Hours,Result
+1,Fail
+2,Fail
+3,Fail
+4,Fail
+5,Pass
+7,Pass
+8,Pass
+
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.neighbors import KNeighborsClassifier
+
+data = pd.read_csv("studentknn.csv")
+
+le = LabelEncoder()
+data["Result"] = le.fit_transform(data["Result"])
+
+X = data[["Hours"]]
+y = data["Result"]
+
+model = KNeighborsClassifier(n_neighbors=3)
+model.fit(X, y)
+
+new_student = [[6]]
+prediction = model.predict(new_student)
+
+if prediction[0] == 1:
+    print("Result: Pass")
+else:
+    print("Result: Fail")
+
+
+*** 8) multiclass_decision_tree ***
+
+from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier
+
+iris = load_iris()
+
+X = iris.data
+y = iris.target
+
+model = DecisionTreeClassifier(max_depth=3, random_state=1)
+
+model.fit(X, y)
+
+new_flower = [[5.1, 3.5, 1.4, 0.2]]
+
+prediction = model.predict(new_flower)
+
+print("Predicted Flower:", iris.target_names[prediction[0]])
+
+
+*** 9) ethics_bias_analysis *** 
+
+
+import pandas as pd
+from sklearn.datasets import fetch_openml
+
+data = fetch_openml("adult", version=2, as_frame=True)
+
+df = data.frame
+
+print("Income Class Distribution:")
+print(df["class"].value_counts())
+
+print("\nGender Distribution:")
+print(df["sex"].value_counts())
+
+print("\nIncome by Gender:")
+print(pd.crosstab(df["sex"], df["class"]))
+
+
+
+
+
+
+
+
+
+
+
