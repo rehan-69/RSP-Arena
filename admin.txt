@@ -1,0 +1,610 @@
+1)***mvc***
+
+**HomeController.cs**
+
+using Microsoft.AspNetCore.Mvc;
+
+namespace ArithmeticMVc.Controllers
+{
+    public class HomeController : Controller
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Calculate(double num1, double num2, string operation)
+        {
+            double result = 0;
+            if (operation == "Addition") 
+            result = num1 + num2;
+            else if (operation == "Subtraction") 
+            result = num1 - num2;
+            else if
+            (operation == "Multiplication")
+            result = num1 * num2;
+            else if (operation == "Division")
+            result = num1 / num2; 
+            
+            ViewBag.Operation = operation;
+            ViewBag.Result = result;
+            return View("Index");
+        }
+
+    }
+}
+
+
+***Index.cshtml***
+
+<h2>Calculator</h2>
+<form asp-action="Calculate" method="post">
+    <input type="number" step="any" name="num1" required /><br><br>
+    <input type="number" step="any" name="num2" required /> <br><br>
+    <select name="operation"><br>
+        <option>Addition</option>
+        <option>Subtraction</option>
+        <option>Multiplication</option>
+        <option>Division</option>
+    </select>
+    <button type="submit">Calculate</button><br>
+</form>
+@if (ViewBag.Result != null)
+{
+    <p>Operation:@ViewBag.Operation</p>
+    <p>Result: @ViewBag.Result</p>
+}
+
+
+2)***floyd's Traingle***
+
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.Write("Enter the number of rows:");
+        int n = Convert.ToInt16(Console.ReadLine());
+
+        int number = 1;
+
+        for(int row = 1; row<=n; row++)
+        {
+            for(int column = 1; column<=row; column++)
+            {
+                Console.Write(number + " ");
+                number++;
+            }
+            Console.WriteLine();
+        }
+    }
+}
+
+3)***10 cities***
+
+using System;
+
+class Program
+
+{
+    static void Main()
+    {
+        string[] cities = new string[10];
+
+        Console.WriteLine("Enter the names of 10 cities:");
+        for(int i =0; i<cities.Length; i++)
+        {
+            Console.Write($"Enter city {i+1}:");
+            cities[i] = Console.ReadLine();
+        }
+
+        Console.WriteLine("Cities in Sorted Order:");
+
+        Array.Sort(cities);
+        for(int i = 0; i < cities.Length; i++)
+        {
+            Console.WriteLine(cities[i]); 
+        }
+    }
+}
+
+4)***Function Overloading***
+
+using System;
+
+class Calculator
+{
+    public int Add(int a, int b)
+    {
+        return a + b;
+    }
+
+    public int Add(int a, int b, int c)
+    {
+        return a + b + c;
+    }
+
+    public double Add(double a, double b)
+    {
+        return a + b;
+    }
+}
+
+
+class Program
+{
+    static void Main()
+    {
+        Calculator calculator = new Calculator();
+
+        int result1=calculator.Add(5,10);
+        int result2 =calculator.Add(5,10,15);
+        double result3=calculator.Add(5.5,10.10);
+
+        Console.WriteLine("Addition of two integers:"+result1);
+        Console.WriteLine("Addition of three integers:"+result2);
+        Console.WriteLine("Addition of two double values:"+result3);
+
+        
+    }
+}
+
+
+5)***inheritance***
+
+using System;
+
+
+//single inheritance
+class Person
+{
+    public void person()
+    {
+        Console.WriteLine("This is a person class");
+    }
+}
+
+class Student : Person
+{
+    public void student()
+    {
+        Console.WriteLine("This is a student class");
+    }
+}
+
+
+//multi-level inheritance
+class GrandFather
+{
+    public void grandFather()
+    {
+        Console.WriteLine("This is a grandfather class");
+    }
+}
+
+class Father : GrandFather
+{
+    public void father()
+    {
+        Console.WriteLine("This is a father class");
+    }
+}
+
+
+class Son : Father
+{
+    public void son()
+    {
+        Console.WriteLine("This is a son class");
+    }
+}
+
+
+
+//hierarchical inheritance
+class Vehical
+{
+    public void vehical()
+    {
+        Console.WriteLine("This is a vehical class");
+    }
+}
+
+class Car : Vehical
+{
+    public void car()
+    {
+        Console.WriteLine("This is a car class");
+    }
+}
+
+
+class Bike : Vehical
+{
+    public void bike()
+    {
+        Console.WriteLine("This is a bike class");
+    }
+}
+
+
+//multiple inheritance using interface
+interface Icamera
+{
+    public void takePhoto();
+}
+
+interface Imusic
+{
+     public void playMusic();
+}
+
+class SmartPhone : Icamera, Imusic
+{
+    public void takePhoto()
+    {
+        Console.WriteLine("This is a camera interface");
+    }
+
+    public void playMusic()
+    {
+        Console.WriteLine("This is a music interface");
+    }
+}
+
+
+
+
+class Program
+{
+    static void Main()
+    {
+        Student student = new Student();
+
+        student.person();
+        student.student();
+
+        Son son = new Son();
+
+        son.grandFather();
+        son.father();
+        son.son();
+
+
+        Car car = new Car();
+        car.vehical();
+        car.car();
+
+        Bike bike = new Bike();
+        bike.vehical();
+        bike.bike();
+ 
+
+        SmartPhone smartPhone = new SmartPhone();
+        smartPhone.takePhoto();
+        smartPhone.playMusic();
+
+    }
+}
+
+6)***Constructor Overloading***
+
+using System;
+using System.Runtime.Intrinsics.Arm;
+
+class Student
+{
+    int id;
+    string name;
+    string course;
+
+    public Student()
+    {
+        id = 0;
+        name = "Unknown";
+        course = "Not assigned";
+    }
+
+    public Student(int i, string n)
+    {
+        id = i;
+        name = n;
+        course = "bscit";
+    }
+
+    public Student(int i, string n, string c)
+    {
+        id = i;
+        name = n;
+        course = c;
+    }
+
+    public void displayData()
+    {
+        Console.WriteLine("ID:" + id);
+        Console.WriteLine("Name:" + name);
+        Console.WriteLine("Course:" + course);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Student s1 = new Student();
+        Student s2 = new Student(101,"rehan");
+        Student s3 = new Student(102,"armaan","bscit");
+
+        s1.displayData();
+        s2.displayData();
+        s3.displayData();
+    }
+}
+
+
+7***exception handling***
+
+class Program
+{
+    static void Main()
+    {
+        try
+        {
+            Console.Write("Enter First Number:");
+            int num1 = Convert.ToInt32(Console.ReadLine());
+
+            Console.Write("Enter Second Number:");
+            int num2 = Convert.ToInt32(Console.ReadLine());
+
+            int result = num1 / num2;
+            Console.WriteLine(result);
+        }
+        catch(FormatException)
+        {
+            Console.WriteLine("Invalid input. Please enter numbers only");
+        }
+        catch(DivideByZeroException)
+        {
+            Console.WriteLine("Cannot divide by zero.");
+        }
+        finally
+        {
+            Console.Write("Program execution completed.");
+        }
+
+    }
+}
+
+8)***delegate_add_mul_sub_div***
+
+using System;
+
+class Calculator
+{
+    public int Add(int a,int b)
+    {
+        return a+b;
+    }
+
+    public int Subtract(int a,int b)
+    {
+        return a-b;
+    }
+
+    public int Multiply(int a,int b)
+    {
+        return a*b;
+    }
+
+    public int Divide(int a,int b)
+    {
+        return a/b;
+    }
+     
+}
+
+class Program
+{
+    delegate int CalculatorDelegate(int a,int b);
+    static void Main()
+    {
+        Calculator calc = new Calculator();
+        CalculatorDelegate del;
+        del = calc.Add;
+        Console.WriteLine("Addition:"+del(10,20));
+        
+        del=calc.Subtract;
+        Console.WriteLine("Subtraction:"+del(10,20));
+
+        del=calc.Multiply;
+        Console.WriteLine("Muliplication:"+del(10,20));
+
+
+        del=calc.Divide;
+        Console.WriteLine("Divide:"+del(10,20));
+
+
+    }
+}
+
+9)***Multicast Delegate***
+
+using System;
+
+class Program
+{
+    static void Message1()
+    {
+        Console.WriteLine("Hello from method 1");
+    }
+
+    static void Message2()
+    {
+        Console.WriteLine("Hello from method 2");
+    }
+
+    static void Message3()
+    {
+        Console.WriteLine("Hello from method 3");
+    }
+
+    delegate void MyDelegate();
+
+    static void Main()
+    {
+        MyDelegate del;
+        del = Message1;
+        del += Message2;
+        del += Message3;
+
+        del();
+    }
+
+
+}
+
+
+10)***BankAccount***
+
+using System;
+
+class BankAccount
+{
+    public int AccountNumber {get;set;}
+    private double balance;
+
+    public double Balance
+    {
+        get
+        {
+           return balance;
+        }
+
+        set
+        {
+            if(value >= 0)
+            {
+                balance=value;
+            }
+            else
+            {
+                Console.WriteLine("balance cannot be negative");
+            }
+        }
+    }
+
+    public void display()
+    {
+        Console.WriteLine("AccounNumer:"+AccountNumber);
+        Console.WriteLine("Balance:"+balance);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        BankAccount account = new BankAccount();
+
+        account.AccountNumber=101;
+        account.Balance=5000;
+        account.display();
+        Console.WriteLine();
+        account.Balance=8000;
+
+    }
+}
+
+
+11)***Student Registration Form***
+
+
+**.aspx.cs**-->logic
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace Practical11
+{
+    public partial class WebForm2 : System.Web.UI.Page
+    {
+        protected void btn_Submit_Click(object sender, EventArgs e)
+        {
+            string gender = "";
+
+            if (rbMale.Checked)
+            {
+                gender = "Male";
+            }
+            else if (rbFemale.Checked)
+            {
+                gender = "Female";
+            }
+            if (chkTerms.Checked)
+            {
+                lblResult.Text = "Name:" + txtName.Text +
+                    "<br/>Gender:" + gender +
+                    "<br/>Course:" + ddlCourse.SelectedValue +
+                    "<br/>Date" + txtDate.Text;
+            }
+            else
+            {
+                lblResult.Text = "Please accept the Terms and Condition";
+            }
+        }
+    }
+}
+
+
+
+**aspx**
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="StudentRegistrationFrom.aspx.cs" Inherits="Practical11.WebForm2" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <h2>Student Registration Form</h2>
+        Student Name:
+        <asp:TextBox ID="txtName" runat="server"></asp:TextBox>
+        <br />
+        <br />
+        Gender:
+        <asp:RadioButton ID="rbMale" Text="Male" runat="server" GroupName="Gender" />
+        <asp:RadioButton ID="rbFemale" Text="Female" runat="server" GroupName="Gender" />
+        <br />
+        <br />
+        Course:
+        <asp:DropDownList ID="ddlCourse" runat="server">
+            <asp:ListItem Text="BSC-IT" />
+            <asp:ListItem Text="BCA" />
+            <asp:ListItem Text="DS" />
+        </asp:DropDownList>
+        <br />
+        <br />
+        Date:
+        <asp:TextBox ID="txtDate" Text="Date" TextMode="Date" runat="server"></asp:TextBox>
+        <br />
+        <br />
+        <asp:CheckBox ID="chkTerms" Text="I accept to the Terms & Condition" runat="server" />
+        <br />
+        <br />
+        <asp:Button ID="btnSubmit" Text="Submit" runat="server" OnClick="btn_Submit_Click" />
+        <br />
+        <br />
+        <asp:Label ID="lblResult" runat="server"></asp:Label>
+    </form>
+</body>
+</html>
