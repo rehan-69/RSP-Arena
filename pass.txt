@@ -1,0 +1,13 @@
+id:-tejasnadankar3@gmail.com
+Tejas@#1234567890
+
+su
+123
+sudo subscription-manager status
+sudo subscription-manager repos \
+--enable=rhel-8-for-x86_64-baseos-rpms \
+--enable=rhel-8-for-x86_64-appstream-rpms
+sudo subscription-manager attach -auto
+sudo dnf clean all
+sudo dnf makecache
+sudo dnf install star
