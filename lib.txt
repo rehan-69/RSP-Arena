@@ -1,0 +1,22 @@
+***LCD***
+
+1. sudo raspi-config
+2. sudo apt-get install -y i2c-tools
+3. sudo i2cdetect -y 1
+4. pip3 install RPLCD smbus2 --break-system-packages
+
+
+***Telegram***
+
+1. pip3 install python-telegram-bot
+2. pip3 install python-telegram-bot --break-system-packages
+3. pip3 install gpiozero
+4. pip3 install gpiozero --break-system-packages
+
+***RFID***
+
+1. sudo raspi-config
+2. sudo reboot
+3. ls /dev/i2c*
+4. i2cdetect -y 1
+5. pip3 install adafruit-blinka adafruit-circuitpython-pn532 --break-system-packages
